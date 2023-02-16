@@ -2,12 +2,6 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 const fs = require('fs/promises');
 
-const executables = {
-  linux: 'tools/ContentBuilder/builder_linux/steamcmd.sh',
-  darwin: 'tools/ContentBuilder/builder_osx/steamcmd.sh',
-  win32: 'tools/ContentBuilder/builder/steamcmd.exe'
-}
-
 async function run() {
   try {
     const manifestPath = `${ process.cwd() }/manifest.vdf`;
@@ -73,7 +67,7 @@ async function run() {
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf'), 'base64'));
     await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents'), 'base64'));
 
-    const executable = `${steamdir}/${executables[process.platform]}`;
+    const executable = `steamcmd`;
 
     //const username = core.getInput('username');
     //const password = core.getInput('password');
