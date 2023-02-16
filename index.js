@@ -3,9 +3,9 @@ const exec = require('@actions/exec');
 const fs = require('fs/promises');
 
 const executables = {
-  linux: 'ContentBuilder/builder_linux/steamcmd.sh',
-  darwin: 'ContentBuilder/builder_osx/steamcmd.sh',
-  win32: 'ContentBuilder/builder/steamcmd.exe'
+  linux: 'tools/ContentBuilder/builder_linux/steamcmd.sh',
+  darwin: 'tools/ContentBuilder/builder_osx/steamcmd.sh',
+  win32: 'tools/ContentBuilder/builder/steamcmd.exe'
 }
 
 async function run() {

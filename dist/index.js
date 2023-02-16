@@ -4121,9 +4121,9 @@ const exec = __nccwpck_require__(514);
 const fs = __nccwpck_require__(225);
 
 const executables = {
-  linux: 'ContentBuilder/builder_linux/steamcmd.sh',
-  darwin: 'ContentBuilder/builder_osx/steamcmd.sh',
-  win32: 'ContentBuilder/builder/steamcmd.exe'
+  linux: 'tools/ContentBuilder/builder_linux/steamcmd.sh',
+  darwin: 'tools/ContentBuilder/builder_osx/steamcmd.sh',
+  win32: 'tools/ContentBuilder/builder/steamcmd.exe'
 }
 
 async function run() {
