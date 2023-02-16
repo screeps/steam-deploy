@@ -7,7 +7,7 @@ async function run() {
     const manifestPath = `${ process.cwd() }/manifest.vdf`;
 
     core.info(`Generating depot manifests`);
-    const appId = core.getInput('appId');
+    const appId = parseInt(core.getInput('appId'));
     const depots = [];
     for(let i = 1; i < 10; i++) {
       const depotId = appId + i;
