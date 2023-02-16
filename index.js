@@ -65,14 +65,14 @@ async function run() {
     await fs.mkdir(`${steamdir}/config`);
 
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf'), 'base64'));
-    await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents'), 'base64'));
+    await fs.writeFile(`/opt/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents'), 'base64'));
 
     const executable = `steamcmd`;
 
-    //const username = core.getInput('username');
-    //const password = core.getInput('password');
-    //const result = await exec.exec(executable, ['+set_steam_guard_code', 'INVALID', '+login', username, password, '+quit']);
-    const result = await exec.exec(executable, ['+quit']);
+    const username = core.getInput('username');
+    const password = core.getInput('password');
+    const result = await exec.exec(executable, ['+login', username, password, '+quit']);
+    //const result = await exec.exec(executable, ['+quit']);
     core.info(`SteamCMD result: ${result}`);
 
     core.setOutput('manifest', manifestPath);
