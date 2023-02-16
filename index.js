@@ -1,4 +1,5 @@
 const core = require('@actions/core');
+const exec = require('@actions/exec');
 const fs = require('fs/promises');
 
 // most @actions toolkit packages have async methods
@@ -59,6 +60,16 @@ async function run() {
 
     await fs.writeFile(manifestPath, manifestText);
     core.info(manifestText);
+
+    const steamdir = core.getInput('steamdir');
+    await fs.mkdir(`${steamdir}/config`);
+
+    await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf')));
+    await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents')));
+
+    const username = core.getInput('username');
+    const password = core.getInput('password');
+    await exec.exec('steamcmd', ['+login', username, password, '+quit']);
 
     core.setOutput('manifest', manifestPath);
   } catch (error) {
