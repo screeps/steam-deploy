@@ -4205,7 +4205,7 @@ async function run() {
 
     const username = core.getInput('username');
     const password = core.getInput('password');
-    const result = await exec.exec(executable, ['+login', username, password, '+quit'], options);
+    const result = await exec.exec(executable, ['+set_steam_guard_code', 'INVALID', '+login', username, password, '+quit'], options);
     core.info(`SteamCMD result: ${result}`);
 
     core.setOutput('manifest', __nccwpck_require__.ab + "manifest.vdf");
