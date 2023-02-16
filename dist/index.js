@@ -2831,18 +2831,18 @@ const fs = __nccwpck_require__(225);
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const manifestPath = `${ process.cwd() }/manifest.vdf`;
+    const manifestPath = __nccwpck_require__.ab + "manifest.vdf";
 
     core.info(`Generating depot manifests`);
-    const appId = core.getInput('appId ');
+    const appId = core.getInput('appId');
     const depots = [];
     for(let i = 1; i < 10; i++) {
       const depotId = appId + i;
-      core.debug(`Depot ID ${depotId}`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+      core.debug(`Depot ID ${depotId}`);
       const depotPath = core.getInput(`depot${i}Path`);
       if(depotPath) {
         depots.push(depotId);
-        core.debug(`Adding depot ${depotId}`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+        core.debug(`Adding depot ${depotId}`);
         const depotText = `"DepotBuildConfig"
 {
   "DepotID" "${depotId}"
@@ -2857,7 +2857,7 @@ async function run() {
   "FileExclusion" "**/*_BackUpThisFolder_ButDontShipItWithYourGame*"
 }`;
         await fs.writeFile(`depot${depotId}.vdf`, depotText);
-        core.debug(depotText);
+        core.info(depotText);
       }
     }
 
@@ -2884,10 +2884,10 @@ async function run() {
     manifestText += `  }\n`;
     manifestText += `}`;
 
-    await fs.writeFile(manifestPath, manifestText);
-    core.debug(manifestText);
+    await fs.writeFile(__nccwpck_require__.ab + "manifest.vdf", manifestText);
+    core.info(manifestText);
 
-    core.setOutput('manifest', manifestPath);
+    core.setOutput('manifest', __nccwpck_require__.ab + "manifest.vdf");
   } catch (error) {
     core.setFailed(error.message);
   }

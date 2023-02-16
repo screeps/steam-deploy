@@ -7,15 +7,15 @@ async function run() {
     const manifestPath = `${ process.cwd() }/manifest.vdf`;
 
     core.info(`Generating depot manifests`);
-    const appId = core.getInput('appId ');
+    const appId = core.getInput('appId');
     const depots = [];
     for(let i = 1; i < 10; i++) {
       const depotId = appId + i;
-      core.debug(`Depot ID ${depotId}`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+      core.debug(`Depot ID ${depotId}`);
       const depotPath = core.getInput(`depot${i}Path`);
       if(depotPath) {
         depots.push(depotId);
-        core.debug(`Adding depot ${depotId}`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+        core.debug(`Adding depot ${depotId}`);
         const depotText = `"DepotBuildConfig"
 {
   "DepotID" "${depotId}"
@@ -30,7 +30,7 @@ async function run() {
   "FileExclusion" "**/*_BackUpThisFolder_ButDontShipItWithYourGame*"
 }`;
         await fs.writeFile(`depot${depotId}.vdf`, depotText);
-        core.debug(depotText);
+        core.info(depotText);
       }
     }
 
@@ -58,7 +58,7 @@ async function run() {
     manifestText += `}`;
 
     await fs.writeFile(manifestPath, manifestText);
-    core.debug(manifestText);
+    core.info(manifestText);
 
     core.setOutput('manifest', manifestPath);
   } catch (error) {
