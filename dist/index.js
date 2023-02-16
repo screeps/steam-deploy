@@ -4120,7 +4120,12 @@ const core = __nccwpck_require__(186);
 const exec = __nccwpck_require__(514);
 const fs = __nccwpck_require__(225);
 
-// most @actions toolkit packages have async methods
+const executables = {
+  linux: 'ContentBuilder/builder_linux/steamcmd.sh',
+  darwin: 'ContentBuilder/builder_osx/steamcmd.sh',
+  win32: 'ContentBuilder/builder/steamcmd.exe'
+}
+
 async function run() {
   try {
     const manifestPath = __nccwpck_require__.ab + "manifest.vdf";
@@ -4186,9 +4191,11 @@ async function run() {
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf')));
     await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents')));
 
+    const executable = executables[process.platform];
+
     const username = core.getInput('username');
     const password = core.getInput('password');
-    const result = await exec.exec('steamcmd', ['+login', username, password, '+quit']);
+    const result = await exec.exec(executable, ['+login', username, password, '+quit']);
     core.info(`SteamCMD result: ${result}`);
 
     core.setOutput('manifest', __nccwpck_require__.ab + "manifest.vdf");
