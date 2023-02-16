@@ -71,7 +71,7 @@ async function run() {
 
     const username = core.getInput('username');
     const password = core.getInput('password');
-    const result = await exec.exec(executable, ['+login', username, password, '+quit']);
+    const result = await exec.exec(executable, ['+set_steam_guard_code', 'INVALID', '+login', username, password, '+quit']);
     //const result = await exec.exec(executable, ['+quit']);
     core.info(`SteamCMD result: ${result}`);
 
