@@ -53,7 +53,7 @@ async function run() {
 
     manifestText += `  "depots"\n  {\n`;
     for(const depot of depots) {
-      manifestText += `    "${depot}" "depot${depot}.vdf"`;
+      manifestText += `    "${depot}" "depot${depot}.vdf"\n`;
     }
     manifestText += `  }\n`;
     manifestText += `}`;
@@ -69,7 +69,8 @@ async function run() {
 
     const username = core.getInput('username');
     const password = core.getInput('password');
-    await exec.exec('steamcmd', ['+login', username, password, '+quit']);
+    const result = await exec.exec('steamcmd', ['+login', username, password, '+quit']);
+    core.info(`SteamCMD result: ${result}`);
 
     core.setOutput('manifest', manifestPath);
   } catch (error) {
