@@ -4193,11 +4193,9 @@ async function run() {
 
     const executable = `${steamdir}/${executables[process.platform]}`;
 
-    await fs.chmod(executable, '755');
-
     const username = core.getInput('username');
     const password = core.getInput('password');
-    const result = await exec.exec(executable, ['+login', username, password, '+quit']);
+    const result = await exec.exec(executable, ['+login', `"${username}"`, `"${password}"`, '+quit']);
     core.info(`SteamCMD result: ${result}`);
 
     core.setOutput('manifest', __nccwpck_require__.ab + "manifest.vdf");
