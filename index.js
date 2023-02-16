@@ -73,7 +73,7 @@ async function run() {
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf')));
     await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents')));
 
-    const executable = executables[process.platform];
+    const executable = `${steamdir}/${executables[process.platform]}`;
 
     const username = core.getInput('username');
     const password = core.getInput('password');
