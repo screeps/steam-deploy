@@ -4180,6 +4180,7 @@ async function run() {
     core.info(manifestText);
 
     const steamdir = core.getInput('steamdir');
+    core.info(`steamdir: ${steamdir}`);
     await fs.mkdir(`${steamdir}/config`);
 
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf')));
