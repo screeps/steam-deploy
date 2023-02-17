@@ -4145,7 +4145,7 @@ async function run() {
       core.debug(`Depot ID ${depotId}`);
       const depotPath = core.getInput(`depot${i}Path`);
       if(depotPath) {
-        if(!s.existsSync(`./${depotPath}`)) {
+        if(!s.existsSync(`./${rootPath}/${depotPath}`)) {
           continue;
         }
         depots.push(depotId);
