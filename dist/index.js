@@ -4193,8 +4193,12 @@ async function run() {
 
     const steamdir = `${process.env['HOME']}/Steam`;
     core.info(`steamdir: ${steamdir}`);
+
     if(!s.existsSync(`${steamdir}/config`)) {
-      await fs.mkdir(`${steamdir}/config`);
+      core.info(`${steamdir}/config not exists, creating`);
+      await fs.mkdir(`${steamdir}/config`, { recursive: true });
+    } else {
+      core.info(`${steamdir}/config exists`);
     }
 
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(configVdf, 'base64'));
