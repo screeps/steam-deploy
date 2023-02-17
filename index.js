@@ -6,7 +6,9 @@ const path = require('path');
 
 async function run() {
   try {
-    const manifestPath = `${ process.cwd() }/manifest.vdf`;
+    const workspace = process.env['GITHUB_WORKSPACE'];
+
+    const manifestPath = `${ workspace }/manifest.vdf`;
 
     core.info(`Generating depot manifests`);
     const appId = parseInt(core.getInput('appId'));
@@ -28,7 +30,7 @@ async function run() {
     "recursive" "1"
   }
 }`;
-        await fs.writeFile(`depot${depotId}.vdf`, depotText);
+        await fs.writeFile(`${ workspace }/depot${depotId}.vdf`, depotText);
         core.info(depotText);
       }
     }
@@ -83,11 +85,6 @@ async function run() {
     }
 
     core.info(`Login successful`);
-
-    const workspace = process.env['GITHUB_WORKSPACE'];
-
-    core.info(`Workspace: ${workspace}`);
-    core.info(`Workspace (2): ${process.env['{GITHUB_WORKSPACE}']}`);
 
     const buildResult = await exec.exec(
         executable,

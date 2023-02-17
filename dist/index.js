@@ -4124,7 +4124,9 @@ const path = __nccwpck_require__(622);
 
 async function run() {
   try {
-    const manifestPath = __nccwpck_require__.ab + "manifest.vdf";
+    const workspace = process.env['GITHUB_WORKSPACE'];
+
+    const manifestPath = `${ workspace }/manifest.vdf`;
 
     core.info(`Generating depot manifests`);
     const appId = parseInt(core.getInput('appId'));
@@ -4146,7 +4148,7 @@ async function run() {
     "recursive" "1"
   }
 }`;
-        await fs.writeFile(`depot${depotId}.vdf`, depotText);
+        await fs.writeFile(`${ workspace }/depot${depotId}.vdf`, depotText);
         core.info(depotText);
       }
     }
@@ -4174,10 +4176,10 @@ async function run() {
     manifestText += `  }\n`;
     manifestText += `}`;
 
-    await fs.writeFile(__nccwpck_require__.ab + "manifest.vdf", manifestText);
+    await fs.writeFile(manifestPath, manifestText);
     core.info(manifestText);
 
-    core.setOutput('manifest', __nccwpck_require__.ab + "manifest.vdf");
+    core.setOutput('manifest', manifestPath);
 
     const steamdir = `${process.env['HOME']}/Steam`;
     core.info(`steamdir: ${steamdir}`);
@@ -4201,11 +4203,6 @@ async function run() {
     }
 
     core.info(`Login successful`);
-
-    const workspace = process.env['GITHUB_WORKSPACE'];
-
-    core.info(`Workspace: ${workspace}`);
-    core.info(`Workspace (2): ${process.env['{GITHUB_WORKSPACE}']}`);
 
     const buildResult = await exec.exec(
         executable,
