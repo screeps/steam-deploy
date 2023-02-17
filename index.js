@@ -27,6 +27,9 @@ async function run() {
       core.debug(`Depot ID ${depotId}`);
       const depotPath = core.getInput(`depot${i}Path`);
       if(depotPath) {
+        if(!s.existsSync(`./${depotPath}`)) {
+          continue;
+        }
         depots.push(depotId);
         core.debug(`Adding depot ${depotId}`);
 
