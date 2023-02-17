@@ -85,6 +85,10 @@ async function run() {
     core.info(`Login successful`);
 
     const workspace = process.env['GITHUB_WORKSPACE'];
+
+    core.info(`Workspace: ${workspace}`);
+    core.info(`Workspace (2): ${process.env['{GITHUB_WORKSPACE}']}`);
+
     const buildResult = await exec.exec(
         executable,
         [
