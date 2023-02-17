@@ -4202,7 +4202,18 @@ async function run() {
 
     core.info(`Login successful`);
 
-    const buildResult = await exec.exec(executable, ['+login', username, password, '+run_app_build', manifestPath, '+quit']);
+    const workspace = process.env['GITHUB_WORKSPACE'];
+    const buildResult = await exec.exec(
+        executable,
+        [
+            '+login',
+          username,
+          password,
+          '+run_app_build',
+          manifestPath,
+          '+quit'
+        ],
+        {cwd: workspace});
     if(buildResult) {
       const logsDirectory = `${steamdir}/Logs`;
       const files = await fs.readdir(logsDirectory);
