@@ -4,6 +4,14 @@ const s = require('fs');
 const fs = require('fs/promises');
 const path = require('path');
 
+function getSteamDir() {
+  if(process.platform == "darwin") {
+    return `${process.env['HOME']}/Library/Application Support/Steam`;
+  }
+
+  return `${process.env['HOME']}/Steam`;
+}
+
 async function run() {
   try {
     const workspace = process.env['GITHUB_WORKSPACE'];
@@ -73,7 +81,7 @@ async function run() {
 
     core.setOutput('manifest', manifestPath);
 
-    const steamdir = `${process.env['HOME']}/Steam`;
+    const steamdir = getSteamDir();
     core.info(`steamdir: ${steamdir}`);
 
     if(!s.existsSync(`${steamdir}/config`)) {

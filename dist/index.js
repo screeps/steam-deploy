@@ -4122,6 +4122,14 @@ const s = __nccwpck_require__(747);
 const fs = __nccwpck_require__(225);
 const path = __nccwpck_require__(622);
 
+function getSteamDir() {
+  if(process.platform == "darwin") {
+    return `${process.env['HOME']}/Library/Application Support/Steam`;
+  }
+
+  return `${process.env['HOME']}/Steam`;
+}
+
 async function run() {
   try {
     const workspace = process.env['GITHUB_WORKSPACE'];
@@ -4191,7 +4199,7 @@ async function run() {
 
     core.setOutput('manifest', manifestPath);
 
-    const steamdir = `${process.env['HOME']}/Steam`;
+    const steamdir = getSteamDir();
     core.info(`steamdir: ${steamdir}`);
 
     if(!s.existsSync(`${steamdir}/config`)) {
