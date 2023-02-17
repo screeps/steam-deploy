@@ -2,10 +2,6 @@ name: 'Steam deploy'
 author: Nikolay Kharitonov <o4kapuk@o4kapuk.ru>
 description: 'Deploy games to Steam with Steamworks SDK'
 inputs:
-  steamdir:
-    required: true
-    default: ''
-    description: 'The directory where steamworks library is installed.'
   username:
     required: true
     default: ''
