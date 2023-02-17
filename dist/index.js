@@ -4118,13 +4118,18 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(186);
 const exec = __nccwpck_require__(514);
+const io = __nccwpck_require__(436);
 const s = __nccwpck_require__(747);
 const fs = __nccwpck_require__(225);
 const path = __nccwpck_require__(622);
 
-function getSteamDir() {
+async function getSteamDir() {
   if(process.platform == "darwin") {
     return `${process.env['HOME']}/Library/Application Support/Steam`;
+  }
+
+  if(process.platform == "win32") {
+    return path.dirname(await io.which('steamcmd.exe'));
   }
 
   return `${process.env['HOME']}/Steam`;
@@ -4133,6 +4138,7 @@ function getSteamDir() {
 async function run() {
   try {
     const workspace = process.env['GITHUB_WORKSPACE'];
+
     const appId = parseInt(core.getInput('appId'));
     const buildDescription = core.getInput('buildDescription');
     const rootPath = core.getInput('rootPath');
@@ -4199,7 +4205,7 @@ async function run() {
 
     core.setOutput('manifest', manifestPath);
 
-    const steamdir = getSteamDir();
+    const steamdir = await getSteamDir();
     core.info(`steamdir: ${steamdir}`);
 
     if(!s.existsSync(`${steamdir}/config`)) {
