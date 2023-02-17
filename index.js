@@ -63,7 +63,7 @@ async function run() {
 
     const steamdir = `${process.env['HOME']}/Steam`;
     core.info(`steamdir: ${steamdir}`);
-    if(!s.existsSync(`steamdir: ${steamdir}`)) {
+    if(!s.existsSync(`${steamdir}/config`)) {
       await fs.mkdir(`${steamdir}/config`);
     }
 
