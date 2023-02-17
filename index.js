@@ -7,11 +7,20 @@ const path = require('path');
 async function run() {
   try {
     const workspace = process.env['GITHUB_WORKSPACE'];
+    const appId = parseInt(core.getInput('appId'));
+    const buildDescription = core.getInput('buildDescription');
+    const rootPath = core.getInput('rootPath');
+    const releaseBranch = core.getInput('releaseBranch');
+    const nobaseline = core.getInput('nobaseline');
+    const username = core.getInput('username');
+    const password = core.getInput('password');
+    const configVdf = core.getInput('configVdf');
+    const ssfnFileName = core.getInput('ssfnFileName');
+    const ssfnFileContents = core.getInput('ssfnFileContents');
 
     const manifestPath = `${ workspace }/manifest.vdf`;
 
     core.info(`Generating depot manifests`);
-    const appId = parseInt(core.getInput('appId'));
     const depots = [];
     for(let i = 1; i < 10; i++) {
       const depotId = appId + i;
@@ -20,16 +29,18 @@ async function run() {
       if(depotPath) {
         depots.push(depotId);
         core.debug(`Adding depot ${depotId}`);
-        const depotText = `"DepotBuildConfig"
-{
-  "DepotID" "${depotId}"
-  "FileMapping"
-  {
-    "LocalPath" "./${depotPath}/*"
-    "DepotPath" "."
-    "recursive" "1"
-  }
-}`;
+
+        let depotText = `"DepotBuildConfig"\n{`;
+        depotText += `  "DepotID" "${depotId}\n"`;
+        depotText += `  "FileMapping"\n  {\n`;
+        depotText += `    "LocalPath" "./${depotPath}/*"\n`;
+        depotText += `    "DepotPath" "."\n`;
+        depotText += `    "recursive" "1"\n`;
+        if(nobaseline) {
+          depotText += `    "nobaseline" "1"\n`;
+        }
+        depotText += `  }\n}`
+
         await fs.writeFile(`${ workspace }/depot${depotId}.vdf`, depotText);
         core.info(depotText);
       }
@@ -37,16 +48,12 @@ async function run() {
 
     let manifestText = `"appbuild"\n{\n  "appid" "${appId}"\n`;
 
-    const buildDescription = core.getInput('buildDescription');
     if(buildDescription) {
       manifestText += `  "desc" "${buildDescription}"\n`;
     }
-    manifestText += `  "buildoutput" "BuildOutput"\n`;
 
-    const rootPath = core.getInput('rootPath');
-    manifestText += `  "contentroot" "${rootPath}"\n`;
+    manifestText += `  "buildoutput" "BuildOutput"\n  "contentroot" "${rootPath}"\n`;
 
-    const releaseBranch = core.getInput('releaseBranch');
     if(releaseBranch) {
       manifestText += `  "setlive" "${releaseBranch}"\n`;
     }
@@ -69,14 +76,12 @@ async function run() {
       await fs.mkdir(`${steamdir}/config`);
     }
 
-    await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf'), 'base64'));
-    await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents'), 'base64'));
+    await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(configVdf, 'base64'));
+    await fs.writeFile(`${steamdir}/${ssfnFileName}`, Buffer.from(ssfnFileContents, 'base64'));
 
     const executable = `steamcmd`;
 
     // test login
-    const username = core.getInput('username');
-    const password = core.getInput('password');
     const testRunResult = await exec.exec(executable, ['+login', username, password, '+quit']);
 
     if(testRunResult) {
