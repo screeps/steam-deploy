@@ -4120,6 +4120,7 @@ const core = __nccwpck_require__(186);
 const exec = __nccwpck_require__(514);
 const s = __nccwpck_require__(747);
 const fs = __nccwpck_require__(225);
+const path = __nccwpck_require__(622);
 
 async function run() {
   try {
@@ -4144,9 +4145,6 @@ async function run() {
     "DepotPath" "."
     "recursive" "1"
   }
-  "FileExclusion" "*.pdb"
-  "FileExclusion" "**/*_BurstDebugInformation_DoNotShip*"
-  "FileExclusion" "**/*_BackUpThisFolder_ButDontShipItWithYourGame*"
 }`;
         await fs.writeFile(`depot${depotId}.vdf`, depotText);
         core.info(depotText);
@@ -4179,6 +4177,8 @@ async function run() {
     await fs.writeFile(__nccwpck_require__.ab + "manifest.vdf", manifestText);
     core.info(manifestText);
 
+    core.setOutput('manifest', __nccwpck_require__.ab + "manifest.vdf");
+
     const steamdir = `${process.env['HOME']}/Steam`;
     core.info(`steamdir: ${steamdir}`);
     if(!s.existsSync(`${steamdir}/config`)) {
@@ -4190,13 +4190,35 @@ async function run() {
 
     const executable = `steamcmd`;
 
+    // test login
     const username = core.getInput('username');
     const password = core.getInput('password');
-    const result = await exec.exec(executable, ['+login', username, password, '+quit']);
-    //const result = await exec.exec(executable, ['+quit']);
-    core.info(`SteamCMD result: ${result}`);
+    const testRunResult = await exec.exec(executable, ['+login', username, password, '+quit']);
 
-    core.setOutput('manifest', __nccwpck_require__.ab + "manifest.vdf");
+    if(testRunResult) {
+      core.setFailed('Steam login failed');
+      return;
+    }
+
+    core.info(`Login successful`);
+
+    const buildResult = await exec.exec(executable, ['+login', username, password, '+run_app_build', manifestPath, '+quit']);
+    if(buildResult) {
+      const logsDirectory = `${steamdir}/Logs`;
+      const files = await fs.readdir(logsDirectory);
+
+      for (const file of files) {
+        const filePath = path.join(logsDirectory, file);
+        const fileStat = await fs.stat(filePath);
+
+        if (fileStat.isFile()) {
+          const contents = await fs.readFile(filePath, 'utf-8');
+          console.log(`${file}:\n${contents}`);
+        }
+      }
+    }
+
+    core.info('Build successful');
   } catch (error) {
     core.setFailed(error.message);
   }
