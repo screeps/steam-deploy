@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
+const s = require('fs');
 const fs = require('fs/promises');
 
 async function run() {
@@ -62,7 +63,9 @@ async function run() {
 
     const steamdir = `${process.env['HOME']}/Steam`;
     core.info(`steamdir: ${steamdir}`);
-    await fs.mkdir(`${steamdir}/config`);
+    if(!s.existsSync(`steamdir: ${steamdir}`)) {
+      await fs.mkdir(`${steamdir}/config`);
+    }
 
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf'), 'base64'));
     await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents'), 'base64'));

@@ -4118,6 +4118,7 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(186);
 const exec = __nccwpck_require__(514);
+const s = __nccwpck_require__(747);
 const fs = __nccwpck_require__(225);
 
 async function run() {
@@ -4180,7 +4181,9 @@ async function run() {
 
     const steamdir = `${process.env['HOME']}/Steam`;
     core.info(`steamdir: ${steamdir}`);
-    await fs.mkdir(`${steamdir}/config`);
+    if(!s.existsSync(`steamdir: ${steamdir}`)) {
+      await fs.mkdir(`${steamdir}/config`);
+    }
 
     await fs.writeFile(`${steamdir}/config/config.vdf`, Buffer.from(core.getInput('configVdf'), 'base64'));
     await fs.writeFile(`${steamdir}/${core.getInput('ssfnFileName')}`, Buffer.from(core.getInput('ssfnFileContents'), 'base64'));
