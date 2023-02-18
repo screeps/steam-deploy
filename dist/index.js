@@ -4143,7 +4143,6 @@ async function run() {
     const buildDescription = core.getInput('buildDescription');
     const rootPath = core.getInput('rootPath');
     const releaseBranch = core.getInput('releaseBranch');
-    const nobaseline = core.getInput('nobaseline');
     const username = core.getInput('username');
     const password = core.getInput('password');
     const configVdf = core.getInput('configVdf');
@@ -4170,10 +4169,7 @@ async function run() {
         depotText += `  "FileMapping"\n  {\n`;
         depotText += `    "LocalPath" "./${depotPath}/*"\n`;
         depotText += `    "DepotPath" "."\n`;
-        depotText += `    "recursive" "1"\n`;
-        if(nobaseline) {
-          depotText += `    "nobaseline" "1"\n`;
-        }
+        depotText += `    "Recursive" "1"\n`;
         depotText += `  }\n}`
 
         await fs.writeFile(`${ workspace }/depot${depotId}.vdf`, depotText);

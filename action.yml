@@ -56,9 +56,6 @@ inputs:
   depot9Path:
     required: false
     description: 'The path to depot9.'
-  nobaseline:
-    required: false
-    description: 'Use nobaseline parameter in uploads'
   releaseBranch:
     required: false
     description: 'The branch within steam that this build will be automatically put live on.'
