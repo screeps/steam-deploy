@@ -1,6 +1,6 @@
 {
   "name": "steam-deploy",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "JavaScript Action Template",
   "main": "index.js",
   "scripts": {
