@@ -1,116 +1,101 @@
-# Create a JavaScript Action
+# Steam Deploy
 
-<p align="center">
-  <a href="https://github.com/actions/javascript-action/actions"><img alt="javscript-action status" src="https://github.com/actions/javascript-action/workflows/units-test/badge.svg"></a>
-</p>
+Github Action to deploy a game to Steam. Multi-platform alternative to [game-ci/steam-deploy](https://github.com/game-ci/steam-deploy) 
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+## Setup
 
-This template includes tests, linting, a validation workflow, publishing, and versioning guidance.
+#### Prerequisites
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+This action assumes you are registered as a [partner](https://partner.steamgames.com/) with Steam.
 
-## Create an action from this template
+#### 1. Create a Steam Build Account
 
-Click the `Use this Template` and provide the new repo details for your action
+Create a specialised builder account that only has access to `Edit App Metadata` and `Publish App Changes To Steam`.
 
-## Code in Main
+https://partner.steamgames.com/doc/sdk/uploading#Build_Account
 
-Install the dependencies
+#### 2. Export your build
 
-```bash
-npm install
-```
+In order to upload a build, this action is assuming that you have created that build in a previous `step` or `job`.
 
-Run the tests :heavy_check_mark:
+For an example of how to do this in Unity, see [Unity Actions](https://github.com/game-ci/unity-actions).
 
-```bash
-$ npm test
+The exported artifact will be used in the next step.
 
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-...
-```
+#### 3. Configure for deployment
 
-## Change action.yml
+In order to configure this action, configure a step that looks like the following:
 
-The action.yml defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-const core = require('@actions/core');
-...
-
-async function run() {
-  try {
-      ...
-  }
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Package for distribution
-
-GitHub Actions will run the entry point from the action.yml. Packaging assembles the code into one file that can be checked in to Git, enabling fast and reliable execution and preventing the need to check in node_modules.
-
-Actions are run from GitHub repos.  Packaging the action will create a packaged action in the dist folder.
-
-Run prepare
-
-```bash
-npm run prepare
-```
-
-Since the packaged index.js is run from the dist folder.
-
-```bash
-git add dist
-```
-
-## Create a release branch
-
-Users shouldn't consume the action from master since that would be latest code and actions can break compatibility between major versions.
-
-Checkin to the v1 release branch
-
-```bash
-git checkout -b v1
-git commit -a -m "v1 release"
-```
-
-```bash
-git push origin v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket:
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Usage
-
-You can now consume the action by referencing the v1 branch
+_(The parameters are explained below)_
 
 ```yaml
-uses: actions/javascript-action@v1
-with:
-  milliseconds: 1000
+jobs:
+  deployToSteam:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: game-ci/steam-deploy@v2
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          password: ${{ secrets.STEAM_PASSWORD }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF}}
+          ssfnFileName: ${{ secrets.STEAM_SSFN_FILE_NAME }}
+          ssfnFileContents: ${{ secrets.STEAM_SSFN_FILE_CONTENTS }}
+          appId: 1234560
+          buildDescription: v1.2.3
+          rootPath: build
+          depot1Path: StandaloneWindows64
+          depot2Path: StandaloneLinux64
+          nobaseline: true
+          releaseBranch: prerelease
 ```
 
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
+## Configuration
+
+#### username
+
+The username of the Steam Build Account that you created in setup step 1.
+
+#### password
+
+The password of the Steam Build Account that you created in setup step 1.
+
+#### configVdf, ssfnFileName, and ssfnFileContents
+
+Deploying to Steam requires using Multi-Factor Authentication (MFA) through Steam Guard .
+This means that simply using username and password isn't enough to authenticate with Steam.
+However, it is possible to go through the MFA process only once by setting up GitHub Secrets for configVdf, ssfnFileName, and ssfnFileContents with these steps:
+1. Install [Valve's offical steamcmd](https://partner.steamgames.com/doc/sdk/uploading#1) on your local machine. All following steps will also be done on your local machine.
+1. Try to login with `steamcmd +login <username> <password> +quit`, which may prompt for the MFA code. If so, type in the MFA code that was emailed to your builder account's email address.
+1. Validate that the MFA process is complete by running `steamcmd +login <username> <password> +quit` again. It should not ask for the MFA code again.
+1. The folder from which you run `steamcmd` will now contain an updated `config/config.vdf` file. Use `cat config/config.vdf | base64 > config_base64.txt` to encode the file. Copy the contents of `config_base64.txt` to a GitHub Secret `STEAM_CONFIG_VDF`.
+1. Find the SSFN file, depending on your platform. **Windows**: The `steamcmd` folder will also contain two files of which the names look like `ssfn<numbers>`. **One of them is a hidden file**. [Find that hidden file](https://support.microsoft.com/en-us/windows/view-hidden-files-and-folders-in-windows-97fbc472-c603-9d90-91d0-1166d1d9f4b5) and use that hidden file as the correct SSFN file for the following steps. **Linux**: The SSFN file will be in the `steamcmd` folder. **Mac**: The SSFN will be at `~/Library/Application\ Support/Steam/`.
+1. Copy the name of the SSFN file to a GitHub Secret `STEAM_SSFN_FILE_NAME`.
+1. Use `cat <ssfnFileName> | base64 > ssfn_base64.txt` to encode the contents of the SSFN file. Copy the encoded contents inside `ssfn_base64.txt` to a GitHub Secret called `STEAM_SSFN_FILE_CONTENTS`.
+
+#### appId
+
+The identifier of your app on steam. You can find it on your [dashboard](https://partner.steamgames.com/dashboard).
+
+#### buildDescription
+
+The identifier for this specific build, which helps you identify it in steam.
+
+It is recommended to use the semantic version of the build for this.
+
+#### rootPath
+
+The root path to your builds. This is the base of which depots will search your files.
+
+#### depot[X]Path
+
+Where X is any number between 1 and 9 (inclusive both).
+
+The relative path following your root path for the files to be included in this depot.
+
+If your appId is 125000 then the depots 125001 ... 125009 will be assumed.
+
+#### releaseBranch
+
+The branch within steam that this build will be automatically put live on.
+
+Note that the `default` branch [has been observed to not work](https://github.com/game-ci/steam-deploy/issues/19) as a release branch, presumably because it is potentially dangerous.
