@@ -14,7 +14,11 @@ async function getSteamDir() {
     return path.dirname(await io.which('steamcmd.exe'));
   }
 
-  return `${process.env['HOME']}/Steam`;
+  if(process.platform == "linux") {
+    return `${process.env['HOME']}/Steam`;
+  }
+
+  throw `Unsupported platform ${process.platform}, only linux, win32, and darwin supported.`
 }
 
 async function run() {
